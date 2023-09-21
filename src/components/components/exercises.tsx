@@ -114,7 +114,7 @@ const Exercises: React.FC = () => {
 
                     <Space style={{ width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", justifyContent: "center" }}>{exercises}</Space>
                     <Button onClick={() => {
-                        setExercisesData(prevData => ([...prevData, { exercise: "", id: Math.floor(Math.random() * 100) }]))
+                        setExercisesData(prevData => ([...prevData, { exercise: "", id: Math.floor(Math.random() * 100), changes: "new" }]))
                     }}>додати</Button>
                 </Space>}
         </Modal>
