@@ -1,0 +1,224 @@
+:root {
+    --red: #ea5d32;
+    --green: #5dea32;
+    --blue: #325dea;
+
+    --orange: #ea8b32;
+    --yellow: #eac832;
+
+    --white: #ffffffea;
+    --black: #000000ea;
+
+    --small_shadow: 2px 2px 5px 0px #0000002c;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* button */
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: var(--white);
+    border: 1px solid var(--blue);
+    box-sizing: border-box;
+    border-right: none;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    border-width: 2px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--white);
+}
+
+html {
+    font-size: 16px;
+
+}
+
+.container {
+    min-height: 100dvh;
+    background-image: url("./background.svg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    min-height: 100dvh;
+    background-position: 0;
+    overflow-x: hidden;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.loading {
+    width: 10vw;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    border: 4px solid #00000022;
+    border-top-color: var(--blue);
+    animation: 1s linear 0s infinite normal forwards loading;
+}
+
+@keyframes loading {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+
+    .table {
+        &_wrapper {
+            width: 95%;
+            margin-inline: auto;
+            margin-top: 1rem;
+        }
+
+        &_container {
+
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            column-gap: 1rem;
+            row-gap: 1rem;
+        }
+
+        &_day {
+            &:nth-child(1) {
+                order: -12;
+            }
+
+            &:nth-child(2) {
+                order: -11;
+            }
+
+            &:nth-child(3) {
+                order: -10;
+            }
+
+            &:nth-child(4) {
+                order: -8;
+            }
+
+            &:nth-child(5) {
+                order: -6;
+            }
+
+            &:nth-child(6) {
+                order: -9;
+            }
+
+            &:nth-child(7) {
+                order: -7;
+            }
+
+        }
+
+        &_lesson {
+            display: grid;
+            grid-template-columns: 1.5rem 6fr 14fr;
+            border-bottom: 1px solid var(--black);
+
+            &:last-child {
+                border-bottom: none !important;
+            }
+
+            &>* {
+                display: flex;
+                align-items: center;
+                padding: 0.25em 0.5em;
+            }
+        }
+
+        &_date {
+            border-right: 1px solid var(--black);
+            justify-content: center;
+
+        }
+
+        &_order {
+            border-right: 1px solid var(--black);
+            justify-content: center;
+        }
+
+        &_subject {
+            border-right: 1px solid var(--black);
+            justify-content: start;
+            padding: 0 0 0 0.5rem;
+        }
+
+        &_task {
+            justify-content: start;
+            padding: 0 0 0 0.5rem;
+        }
+
+    }
+
+    .add {
+        &_subject {
+            display: flex;
+            flex-wrap: wrap;
+        }
+    }
+
+    .ant-modal-body {
+        max-height: 70dvh;
+        overflow-y: scroll;
+    }
+
+    .timetable {
+
+        &_container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        &_modal {
+            min-width: 75dvw !important;
+            top: 5%;
+            max-width: 100%;
+        }
+
+        &_day {
+            display: flex;
+            flex-direction: column;
+        }
+
+        &_component {
+            display: grid;
+            grid-template-columns: 1.5rem auto;
+            border-bottom: 1px solid var(--black);
+
+            &:last-child {
+                border-bottom: none !important;
+            }
+
+            &>* {
+                display: flex;
+                align-items: center;
+                padding: 0.25em 0.5em;
+            }
+        }
+
+        &_subject {
+            justify-content: start;
+            padding: 0 0 0 0.5rem;
+            box-shadow: none !important;
+
+            & * {
+                border: none !important;
+            }
+        }
+    }
+
+}
