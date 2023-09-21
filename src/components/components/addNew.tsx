@@ -234,7 +234,7 @@ const AddNew: React.FC = () => {
                 </Space>}
         </Modal >
         <Space align="center" style={{width: "100%", display: "flex", justifyContent: "center"}}>
-            <Tooltip title='додати результат'>
+            <Tooltip title='додати'>
                 <Button onClick={() => {
                     setOpenAdd(true)
                     getNeededInfo()
