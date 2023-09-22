@@ -1,6 +1,6 @@
 export type TdaysOfWeek = "понеділок" | "вівторок" | "середа" | "четвер" | "п\'ятниця" | "субота"
 
-export type Tchanges = "affiliation" | "exercise" | "delete_affiliation" | "delete_exercise" | "new"
+export type Tchanges = "affiliation" | "exercise" | "delete" | "new"
 
 export interface Itimetable {
     affiliation: string,

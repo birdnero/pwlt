@@ -38,7 +38,7 @@ const Timetable: React.FC = () => {
                 addonAfter={<DeleteOutlined onClick={() => {
                     setExercisesData(prevData => prevData.map(el3 => {
                         if (el.affiliation === el3.affiliation) {
-                            return { affiliation: el3.affiliation, position: el3.position, exercise: el3.exercise, changes: ["delete_affiliation"] }
+                            return { affiliation: el3.affiliation, position: el3.position, exercise: el3.exercise, changes: ["delete"] }
                         } else {
                             return el3
                         }
@@ -57,7 +57,7 @@ const Timetable: React.FC = () => {
                     if (affiliation_I) {
                         setExercisesData(prevData => prevData.map(el2 => {
                             if (el.affiliation === el2.affiliation) {
-                                return { affiliation: value.target.value, exercise: el2.exercise, position: el2.position, changes: ["affiliation"], help_info: el2.affiliation }
+                                return { affiliation: value.target.value, exercise: el2.exercise, position: el2.position, changes: ["affiliation"], help_info: [...el2.help_info, el2.affiliation] }
                             } else {
                                 return el2
                             }
@@ -84,7 +84,7 @@ const Timetable: React.FC = () => {
                 return (<Space style={{ display: "grid", gridTemplateColumns: "1fr 9fr 2fr" }} key={el4.position + Math.random()}>
                     <div>{el4.position}</div>
                     <Select
-                        style={{width: "100%"}}
+                        style={{ width: "100%" }}
                         // штука що зберігає зміни при зміні вправи
                         onChange={value => {
                             setExercisesData(prevData => prevData.map(el3 => {
@@ -103,25 +103,24 @@ const Timetable: React.FC = () => {
                     <DeleteOutlined
                         onClick={() => setExercisesData(prevData => {
                             let deleted_I = el4.position
-                            return prevData.map(el3 => {
+                            const answer: Itimetable[] = []
+                            prevData.forEach(el3 => {
                                 // знаходження елементів з аотрібної комбінації
                                 if (el.affiliation === el3.affiliation) {
                                     // пошук потрібної позиції
                                     if (el4.position === el3.position) {
-                                        deleted_I = el3.position
-                                        return { affiliation: el3.affiliation, position: el3.position, exercise: el3.exercise, changes: ["delete_exercise"] }
+                                        answer.push({ affiliation: el3.affiliation, position: el3.position, exercise: el3.exercise, changes: ["delete"] })
                                         // зміна позицій всіх наступних елементів
                                     } else if (deleted_I < el3.position) {
-                                        deleted_I = el3.position
-                                        const changes = el3.changes ? el3.changes : []
-                                        return { affiliation: el3.affiliation, position: el3.position - 1, exercise: el3.exercise, changes: [...changes, 'exercise'] }
+                                        answer.push({ affiliation: el3.affiliation, position: el3.position - 1, exercise: el3.exercise, changes: [...el3.changes as [], 'exercise'] })
                                     } else {
-                                        return el3
+                                        answer.push(el3)
                                     }
                                 } else {
-                                    return el3
+                                    answer.push(el3)
                                 }
                             })
+                            return answer
 
                         })} />
                 </Space>)
@@ -130,7 +129,11 @@ const Timetable: React.FC = () => {
             {el.elements.length < 9 ?
                 <Button
                     type='text'
-                    onClick={() => setExercisesData(prevData => ([...prevData, { affiliation: el.affiliation, position: el.elements.length + 1, exercise: "", changes: ["new"] }]))}>+</Button> : <></>}
+                    onClick={() => setExercisesData(prevData => {
+                        let position3: number = el.elements.reduce((acc, el2) => (acc > el2.position ? acc : el2.position), 0)
+                        position3++
+                        return ([...prevData, { affiliation: el.affiliation, position: position3, exercise: "", changes: ["new"] }])
+                    })}>+</Button> : <></>}
         </div>))
 
         // складання фінального вигляду таблиці комбінацій
@@ -140,7 +143,11 @@ const Timetable: React.FC = () => {
             </Space>
             {/* кнопка для додавання комбінації */}
             <Button
-                onClick={() => setExercisesData(prevData => ([...prevData, { affiliation: "#" + Math.floor(Math.random() * 10000), exercise: "", position: 1, changes: ['new'] }]))}>
+                onClick={() => {
+                    setExercisesData(prevData => ([...prevData, { affiliation: "#" + Math.floor(Math.random() * 10000), exercise: "", position: 1, changes: ['new'] }]))
+                    console.log(exercisesData)
+                }
+                }>
                 додати
             </Button>
         </>)
@@ -155,7 +162,7 @@ const Timetable: React.FC = () => {
             let change_I = true
 
             el.changes?.forEach(changes => {
-                if (changes === "delete_exercise" || changes === "delete_affiliation") {
+                if (changes === "delete") {
                     change_I = false
                 }
             })
@@ -207,23 +214,14 @@ const Timetable: React.FC = () => {
 
     const setNewValues = () => {
 
-        const insert_data: Iaffiliation[] = []
+        const insert_data: Itimetable[] = []
         const update_affiliation_data: { old_affiliation: string, new_affiliation: string }[] = []
         const update_exercise_data: Itimetable[] = []
-        const delete_affiliation_data: string[] = []
         const delete_exercise_data: Itimetable[] = []
-
-        const list_of_needed: Itimetable[] = [...exercisesData]
+        console.log(exercisesData)
         //перевірка на пустоту вправ та видалення повторюваних елементів
-        list_of_needed.forEach((el1, index1) => {
-            list_of_needed.forEach((el2, index2) => {
-                if (el1.position === el2.position && el1.affiliation === el2.affiliation) {
-                    list_of_needed.splice((index1 < index2 ? index1 : index2), 1)
-                }
-            })
-        })
         let empty_exercises_I = true
-        list_of_needed.forEach(el1 => {
+        exercisesData.forEach(el1 => {
             if (el1.exercise === "") {
                 empty_exercises_I = false
             }
@@ -232,55 +230,50 @@ const Timetable: React.FC = () => {
         if (empty_exercises_I) {
 
             // сортування по змінах
-            list_of_needed.forEach(el => {
-                el.changes?.forEach(changes => {
+            exercisesData.forEach(el => {
+                const mod = el.changes ? el.changes : []
 
-                    switch (changes) {
-                        case "new":
-                            let A = true
-                            insert_data.forEach(el2 => {
-                                if (el2.affiliation === el.affiliation) {
-                                    A = false
-                                    el2.elements.push({ position: el.position, exercise: el.exercise })
-                                }
+                if (mod[0] === "new") {
+                    let del_I = true
+                    mod.forEach(el3 => {
+                        if (el3 === "delete") {
+                            del_I = false
+                        }
+                    })
+                    if (del_I) {
+                        insert_data.push({ affiliation: el.affiliation, position: el.position, exercise: el.exercise })
 
-                            })
-                            if (A) {
-                                insert_data.push({
-                                    affiliation: el.affiliation,
-                                    elements: [{ position: el.position, exercise: el.exercise }]
-                                })
+                        mod.forEach(el3 => {
+                            if (el3 === "affiliation") {
+                                update_affiliation_data.push({ old_affiliation: el.help_info[0], new_affiliation: el.affiliation })
                             }
-                            break;
-                        case "affiliation":
-                            update_affiliation_data.push({ old_affiliation: el.help_info, new_affiliation: el.affiliation })
-                            break;
-                        case "exercise":
-                            update_exercise_data.push({ affiliation: el.affiliation, position: el.position, exercise: el.exercise })
-                            break;
-                        case "delete_affiliation":
-                            delete_affiliation_data.push(el.affiliation)
-                            break;
-                        case "delete_exercise":
-                            delete_exercise_data.push({ affiliation: el.affiliation, position: el.position, exercise: el.exercise })
-                            break;
-                        default:
-                            break;
+                        })
                     }
-                })
-                // запит з передачею всіх змін
-                FetchFn({
-                    type: "update_timetable",
-                    insert: JSON.stringify(insert_data),
-                    update_affiliation: JSON.stringify(update_affiliation_data),
-                    update_exercise: JSON.stringify(update_exercise_data),
-                    delete_affiliation: JSON.stringify(delete_affiliation_data),
-                    delete_exercise: JSON.stringify(delete_exercise_data)
-                }, () => {
-                    setOpenTimeTable(false)
-                }, setLoading2, errorMessage)
+                } else {
+                    mod.forEach(el3 => {
+                        if (el3 === "delete") {
+                            delete_exercise_data.push({ affiliation: el.affiliation, position: el.position, exercise: el.exercise })
+                        }
+                        if (el3 === "affiliation") {
+                            update_affiliation_data.push({ old_affiliation: el.help_info[0], new_affiliation: el.affiliation })
+                        }
+                        if (el3 === "exercise") {
+                            update_exercise_data.push({ affiliation: el.affiliation, position: el.position, exercise: el.exercise })
+                        }
+                    })
+                }
 
             })
+            // запит з передачею всіх змін
+            FetchFn({
+                type: "update_timetable",
+                insert: JSON.stringify(insert_data),
+                update_affiliation: JSON.stringify(update_affiliation_data),
+                update_exercise: JSON.stringify(update_exercise_data),
+                delete_exercise: JSON.stringify(delete_exercise_data)
+            }, () => {
+                setOpenTimeTable(false)
+            }, setLoading2, errorMessage)
 
         } else {
             SendErrorMessage("пуста вправа")
