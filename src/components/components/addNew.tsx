@@ -111,7 +111,7 @@ const AddNew: React.FC = () => {
                     let change_I = true
 
                     el.changes?.forEach(changes => {
-                        if (changes === "delete_exercise" || changes === "delete_affiliation") {
+                        if (changes === "delete") {
                             change_I = false
                         }
                     })
