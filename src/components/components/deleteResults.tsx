@@ -84,7 +84,7 @@ const DeleteResults: React.FC = () => {
                         }, () => {
                             setOpenTimeTable(false)
                         }, setLoading2, errorMessage)
-                    }}>видалити не існуючі</Button>
+                    }}>видалити не існуючі вправи</Button>
                 </Space>}
         </Modal>
         <Button onClick={() => {

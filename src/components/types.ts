@@ -3,6 +3,7 @@ export type TdaysOfWeek = "понеділок" | "вівторок" | "сере�
 export type Tchanges = "affiliation" | "exercise" | "delete" | "new"
 
 export interface Itimetable {
+    id: number,
     affiliation: string,
     position: number,
     exercise: string,
@@ -20,9 +21,17 @@ export interface Iexercises {
 export interface Iaffiliation {
     affiliation: string,
     elements: {
+        id: number,
         position: number,
         exercise: string,
     }[]
+}
+
+export interface IsaveRequest {
+    id?: number,
+    affiliation: string,
+    position: number,
+    exercise: string,
 }
 
 export type Tweight = {

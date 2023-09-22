@@ -121,14 +121,14 @@ const AddNew: React.FC = () => {
                         exercises_array.forEach(el2 => {
                             if (el2.affiliation === el.affiliation) {
                                 A = false
-                                el2.elements.push({ position: el.position, exercise: el.exercise })
+                                el2.elements.push({id: el.id, position: el.position, exercise: el.exercise })
                             }
 
                         })
                         if (A) {
                             exercises_array.push({
                                 affiliation: el.affiliation,
-                                elements: [{ position: el.position, exercise: el.exercise }]
+                                elements: [{id: el.id, position: el.position, exercise: el.exercise }]
                             })
                         }
 

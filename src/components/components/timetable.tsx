@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import '../diary.scss'
 import Loading from './loading'
 import { useActions } from '../../store/hooks/useActions'
-import { Iaffiliation, Iexercises, Itimetable } from '../types'
+import { Iaffiliation, Iexercises, IsaveRequest, Itimetable } from '../types'
 import { Button, Input, Modal, Select, SelectProps, Space } from 'antd'
 import { DeleteOutlined, LoadingOutlined } from '@ant-design/icons'
 import { FetchFn } from '../ADDITIONAL'
@@ -38,7 +38,7 @@ const Timetable: React.FC = () => {
                 addonAfter={<DeleteOutlined onClick={() => {
                     setExercisesData(prevData => prevData.map(el3 => {
                         if (el.affiliation === el3.affiliation) {
-                            return { affiliation: el3.affiliation, position: el3.position, exercise: el3.exercise, changes: ["delete"] }
+                            return { id: el3.id, affiliation: el3.affiliation, position: el3.position, exercise: el3.exercise, changes: ["delete"] }
                         } else {
                             return el3
                         }
@@ -57,7 +57,7 @@ const Timetable: React.FC = () => {
                     if (affiliation_I) {
                         setExercisesData(prevData => prevData.map(el2 => {
                             if (el.affiliation === el2.affiliation) {
-                                return { affiliation: value.target.value, exercise: el2.exercise, position: el2.position, changes: ["affiliation"], help_info: [...el2.help_info, el2.affiliation] }
+                                return { id: el2.id, affiliation: value.target.value, exercise: el2.exercise, position: el2.position, changes: ["affiliation"] }
                             } else {
                                 return el2
                             }
@@ -89,8 +89,8 @@ const Timetable: React.FC = () => {
                         onChange={value => {
                             setExercisesData(prevData => prevData.map(el3 => {
                                 const changes = el3.changes ? el3.changes : []
-                                if (el4.position === el3.position && el.affiliation === el3.affiliation) {
-                                    return { affiliation: el3.affiliation, position: el3.position, exercise: value, changes: [...changes, "exercise"] }
+                                if (el3.id === el4.id) {
+                                    return { id: el3.id, affiliation: el3.affiliation, position: el3.position, exercise: value, changes: [...changes, "exercise"] }
                                 } else {
                                     return el3
                                 }
@@ -105,14 +105,18 @@ const Timetable: React.FC = () => {
                             let deleted_I = el4.position
                             const answer: Itimetable[] = []
                             prevData.forEach(el3 => {
-                                // знаходження елементів з аотрібної комбінації
+                                // знаходження елементів з потрібної комбінації
                                 if (el.affiliation === el3.affiliation) {
                                     // пошук потрібної позиції
                                     if (el4.position === el3.position) {
-                                        answer.push({ affiliation: el3.affiliation, position: el3.position, exercise: el3.exercise, changes: ["delete"] })
+                                        if (el3.changes) {
+                                            answer.push({ id: el3.id, affiliation: el3.affiliation, position: el3.position, exercise: el3.exercise, changes: [...el3.changes, 'delete'] })
+                                        } else {
+                                            answer.push({ id: el3.id, affiliation: el3.affiliation, position: el3.position, exercise: el3.exercise, changes: ['delete'] })
+                                        }
                                         // зміна позицій всіх наступних елементів
                                     } else if (deleted_I < el3.position) {
-                                        answer.push({ affiliation: el3.affiliation, position: el3.position - 1, exercise: el3.exercise, changes: [...el3.changes as [], 'exercise'] })
+                                            answer.push({ id: el3.id, affiliation: el3.affiliation, position: el3.position - 1, exercise: el3.exercise, changes: el3.changes })
                                     } else {
                                         answer.push(el3)
                                     }
@@ -132,7 +136,7 @@ const Timetable: React.FC = () => {
                     onClick={() => setExercisesData(prevData => {
                         let position3: number = el.elements.reduce((acc, el2) => (acc > el2.position ? acc : el2.position), 0)
                         position3++
-                        return ([...prevData, { affiliation: el.affiliation, position: position3, exercise: "", changes: ["new"] }])
+                        return ([...prevData, { id: Math.floor(Math.random() * 10000), affiliation: el.affiliation, position: position3, exercise: "", changes: ["new"] }])
                     })}>+</Button> : <></>}
         </div>))
 
@@ -144,7 +148,7 @@ const Timetable: React.FC = () => {
             {/* кнопка для додавання комбінації */}
             <Button
                 onClick={() => {
-                    setExercisesData(prevData => ([...prevData, { affiliation: "#" + Math.floor(Math.random() * 10000), exercise: "", position: 1, changes: ['new'] }]))
+                    setExercisesData(prevData => ([...prevData, { id: Math.floor(Math.random() * 10000), affiliation: "#" + Math.floor(Math.random() * 10000), exercise: "", position: 1, changes: ['new'] }]))
                     console.log(exercisesData)
                 }
                 }>
@@ -172,14 +176,14 @@ const Timetable: React.FC = () => {
                 exercises_array.forEach(el2 => {
                     if (el2.affiliation === el.affiliation) {
                         A = false
-                        el2.elements.push({ position: el.position, exercise: el.exercise })
+                        el2.elements.push({ id: el.id, position: el.position, exercise: el.exercise })
                     }
 
                 })
                 if (A) {
                     exercises_array.push({
                         affiliation: el.affiliation,
-                        elements: [{ position: el.position, exercise: el.exercise }]
+                        elements: [{ id: el.id, position: el.position, exercise: el.exercise }]
                     })
                 }
 
@@ -214,16 +218,24 @@ const Timetable: React.FC = () => {
 
     const setNewValues = () => {
 
-        const insert_data: Itimetable[] = []
-        const update_affiliation_data: { old_affiliation: string, new_affiliation: string }[] = []
-        const update_exercise_data: Itimetable[] = []
-        const delete_exercise_data: Itimetable[] = []
+        const insert_data: IsaveRequest[] = []
+        const update_affiliation_data: { id: number, new_affiliation: string }[] = []
+        const update_exercise_data: IsaveRequest[] = []
+        const delete_exercise_data: number[] = []
         console.log(exercisesData)
         //перевірка на пустоту вправ та видалення повторюваних елементів
         let empty_exercises_I = true
         exercisesData.forEach(el1 => {
             if (el1.exercise === "") {
                 empty_exercises_I = false
+                console.log(el1)
+                if (el1.changes && el1.changes[0] === "new") {
+                    el1.changes.forEach(el => {
+                        if (el === "delete") {
+                            empty_exercises_I = true
+                        }
+                    })
+                }
             }
         })
 
@@ -242,23 +254,17 @@ const Timetable: React.FC = () => {
                     })
                     if (del_I) {
                         insert_data.push({ affiliation: el.affiliation, position: el.position, exercise: el.exercise })
-
-                        mod.forEach(el3 => {
-                            if (el3 === "affiliation") {
-                                update_affiliation_data.push({ old_affiliation: el.help_info[0], new_affiliation: el.affiliation })
-                            }
-                        })
                     }
                 } else {
                     mod.forEach(el3 => {
                         if (el3 === "delete") {
-                            delete_exercise_data.push({ affiliation: el.affiliation, position: el.position, exercise: el.exercise })
+                            delete_exercise_data.push(el.id)
                         }
                         if (el3 === "affiliation") {
-                            update_affiliation_data.push({ old_affiliation: el.help_info[0], new_affiliation: el.affiliation })
+                            update_affiliation_data.push({ id: el.id, new_affiliation: el.affiliation })
                         }
                         if (el3 === "exercise") {
-                            update_exercise_data.push({ affiliation: el.affiliation, position: el.position, exercise: el.exercise })
+                            update_exercise_data.push({ id: el.id, affiliation: el.affiliation, position: el.position, exercise: el.exercise })
                         }
                     })
                 }
