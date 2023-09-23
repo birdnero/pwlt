@@ -8,7 +8,7 @@ export const days: TdaysOfWeek[] = ["понеділок", "вівторок", "�
 export const FetchFn = (requestArray: { [key: string]: any },
     Function?: (data: any) => any,
     setLoading?: ((value: React.SetStateAction<boolean>) => void) | null,
-    errorMessage?: (payload: Ipayload) => errorMessageAction) => {
+    errorMessage?: (payload: Ipayload) => errorMessageAction, cookie: boolean= false ) => {
     const SendErrorMessage = (message: React.ReactNode | string, time: number = 1.5): void => {
         if (errorMessage) {
             errorMessage({
@@ -26,7 +26,11 @@ export const FetchFn = (requestArray: { [key: string]: any },
         requestData.append(el[0], el[1])
     })
     setLoading ? setLoading(true) : null
-    return fetch(url, {
+    return fetch(url, cookie? {
+        method: 'POST',
+        body: requestData,
+        credentials: "include",
+    } : {
         method: 'POST',
         body: requestData,
     })
