@@ -112,7 +112,11 @@ const Table: React.FC = () => {
                         <Button onClick={() => setOpenSettings(true)} type="link" icon={<SettingTwoTone />} />
                     </Tooltip>
                 </Space>
-            <Space>{exercises}</Space>
+            <Space style={{
+                display: "flex",
+                flexWrap: "wrap"
+
+            }}>{exercises}</Space>
             {Chartdata ? <Line options={{
                 backgroundColor: "#00000000",
                 scales: {

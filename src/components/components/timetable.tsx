@@ -81,7 +81,7 @@ const Timetable: React.FC = () => {
                         spec_options.push(el5)
                     }
                 })
-                return (<Space style={{ display: "grid", gridTemplateColumns: "1fr 9fr 2fr" }} key={el4.position + Math.random()}>
+                return (<Space style={{ display: "grid", gridTemplateColumns: "1fr 9fr 2fr" }} key={el4.position + Math.random()} className='elepsisiSelect'>
                     <div>{el4.position}</div>
                     <Select
                         style={{ width: "100%" }}
