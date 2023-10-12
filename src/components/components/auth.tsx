@@ -67,7 +67,7 @@ const Auth: React.FC = () => {
         
         {contextHolder}
         <Title>Вхід В PWLT ing</Title>
-        <Input
+        <Input.Password
             ref={inputRef}
             addonAfter={loading ? <LoadingOutlined /> : <CheckOutlined onClick={() => CheckAuth()} />}
             onChange={value => setInput(value.target.value)}

@@ -238,6 +238,7 @@ const AddNew: React.FC = () => {
                 <Button onClick={() => {
                     setOpenAdd(true)
                     getNeededInfo()
+                    setWeight([])
                     ExerciseDataNode()
                 }}>+</Button>
         </Tooltip>

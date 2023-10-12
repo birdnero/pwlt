@@ -5,7 +5,7 @@ import { Iresult } from '../types'
 import { useActions } from '../../store/hooks/useActions'
 import Settings from './settings'
 import Loading from './loading'
-import { Button, Modal, Space, Tooltip } from 'antd'
+import { Button, Modal, Space, Tooltip, Typography } from 'antd'
 import { SettingTwoTone } from '@ant-design/icons'
 import {
     Chart as ChartJS,
@@ -33,6 +33,7 @@ ChartJS.register(
     Title,
     ChartTooltip
 );
+
 const Table: React.FC = () => {
     const [loading, setLoading] = useState(false)
     const [FT, setFT] = useState(true)
@@ -40,12 +41,17 @@ const Table: React.FC = () => {
     const { errorMessage } = useActions()
     const [Chartdata, setChartdata] = useState<ChartData<"line", (number | [number, number] | Point | BubbleDataPoint | null)[], unknown>>()
     const [exercises, setExercises] = useState<ReactNode[]>([])
+    const [naming, setNaming] = useState('')
 
 
     useEffect(() => {
         if (FT) {
             FetchFn({ type: "get_results" }, (data: Iresult[]) => {
-                const data3 = [...data]
+                const data3: Iresult[] = data.map(date => {
+                    let answer = { ...date }
+                    answer.date = dayjs(date.date).format('MM.DD')
+                    return answer
+                })
                 data3.sort((a, b) => {
                     const dateA = dayjs(a.date);
                     const dateB = dayjs(b.date);
@@ -65,11 +71,37 @@ const Table: React.FC = () => {
                             answer1.push(el.exercise)
                         }
                     })
+
+                    const first_el = answer1[0]
+                    const labels: string[] = []
+                    const weight: number[] = []
+                    data3.forEach(el3 => {
+                        if (el3.exercise === first_el) {
+                            setNaming(first_el)
+                            labels.push(el3.date)
+                            weight.push(el3.weight)
+                        }
+                    })
+                    setChartdata({
+                        labels: labels,
+                        datasets: [
+                            {
+                                backgroundColor: undefined,
+                                label: "кг",
+                                data: weight,
+                                pointBackgroundColor: styles.$blue,
+                                tension: 0.333,
+                            }
+                        ],
+
+                    })
+
                     return answer1.map(el => (<Button onClick={() => {
                         const labels: string[] = []
                         const weight: number[] = []
                         data3.forEach(el3 => {
                             if (el3.exercise === el) {
+                                setNaming(el)
                                 labels.push(el3.date)
                                 weight.push(el3.weight)
                             }
@@ -106,39 +138,56 @@ const Table: React.FC = () => {
         </Modal>
 
         {loading ? <Loading /> : <Space direction='vertical' style={{ width: "100dvw" }}>
-                    <AddNew />
-                <Space style={{position: "absolute", top: "2.5%", right: "2.5%"}}>
-                    <Tooltip title='налаштування'>
-                        <Button onClick={() => setOpenSettings(true)} type="link" icon={<SettingTwoTone />} />
-                    </Tooltip>
-                </Space>
+            <AddNew />
+            <Space style={{ position: "absolute", top: "2.5%", right: "2.5%" }}>
+                <Tooltip title='налаштування'>
+                    <Button onClick={() => setOpenSettings(true)} type="link" icon={<SettingTwoTone />} />
+                </Tooltip>
+            </Space>
             <Space style={{
                 display: "flex",
                 flexWrap: "wrap"
 
             }}>{exercises}</Space>
-            {Chartdata ? <Line options={{
-                backgroundColor: "#00000000",
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            drawTicks: false,
-                            drawOnChartArea: true,
+            {Chartdata ? <div style={{ width: "95dvw", marginLeft: "2.5dvw", marginRight: "2.5dvw" }}>
+                <div style={{
+                    width: "100%",
+                    display: "flex",
+                    justifyContent: "center"
+                }}>
+                    <Typography.Title level={1} style={{ color: styles.$black }} >{naming}</Typography.Title>
+                </div>
+                <Line options={{
+                    backgroundColor: "#00000000",
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback(tickValue) {
+                                    return tickValue + " кг"
+                                },
+                            },
+                            beginAtZero: true,
+                            grid: {
+                                drawTicks: false,
+                                drawOnChartArea: true,
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxTicksLimit: 10,
+                                padding: 15
+                            },
+                            grid: {
+                                drawTicks: false,
+                                drawOnChartArea: false,
+                            },
                         }
                     },
-
-                    x: {
-                        grid: {
-                            drawTicks: false,
-                            drawOnChartArea: false,
-                        },
-                    }
-                },
-            }} data={Chartdata ? Chartdata : {
-                labels: [],
-                datasets: [],
-            }} /> : ""}
+                }} data={Chartdata ? Chartdata : {
+                    labels: [],
+                    datasets: [],
+                }} />
+            </div> : ""}
         </Space>}
     </>)
 }
