@@ -145,18 +145,17 @@ const Table: React.FC = () => {
                 </Tooltip>
             </Space>
             <Space style={{
+                width: "95dvw",
+                marginRight: "4dvw", 
+                marginLeft: "1dvh",
                 display: "flex",
                 flexWrap: "wrap"
 
             }}>{exercises}</Space>
-            {Chartdata ? <div style={{ width: "95dvw", marginLeft: "2.5dvw", marginRight: "2.5dvw" }}>
-                <div style={{
-                    width: "100%",
-                    display: "flex",
-                    justifyContent: "center"
-                }}>
-                    <Typography.Title level={1} style={{ color: styles.$black }} >{naming}</Typography.Title>
-                </div>
+            {Chartdata ? <div style={{ width: "95dvw", marginRight: "4dvw", marginLeft: "1dvh" }}>
+                
+                    <Typography.Title level={2} style={{ color: styles.$blue }} >{naming}</Typography.Title>
+                
                 <Line options={{
                     backgroundColor: "#00000000",
                     scales: {
